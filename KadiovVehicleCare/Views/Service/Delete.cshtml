@@ -1,0 +1,31 @@
+﻿@model KadiovVehicleCare.ViewModels.ServiceViewModel
+
+@{
+    ViewData["Title"] = "Изтриване на услуга";
+}
+
+<h1>Изтриване на услуга</h1>
+
+<h4>Сигурни ли сте, че искате да изтриете тази услуга?</h4>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-3">Име</dt>
+        <dd class="col-sm-9">@Model.Name</dd>
+
+        <dt class="col-sm-3">Описание</dt>
+        <dd class="col-sm-9">@Model.Description</dd>
+
+        <dt class="col-sm-3">Цена</dt>
+        <dd class="col-sm-9">@Model.Price</dd>
+
+        <dt class="col-sm-3">Продължителност</dt>
+        <dd class="col-sm-9">@Model.DurationInMinutes мин.</dd>
+    </dl>
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Изтрий</button>
+    <a asp-action="Index" class="btn btn-secondary">Назад</a>
+</form>

@@ -1,4 +1,6 @@
 using KadiovVehicleCare.Data;
+using KadiovVehicleCare.Interfaces;
+using KadiovVehicleCare.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,6 +28,7 @@ namespace KadiovVehicleCare
             .AddEntityFrameworkStores<ApplicationDbContext>();
 
             builder.Services.AddControllersWithViews();
+            builder.Services.AddScoped<IServiceRepository,ServiceRepository>();
 
             var app = builder.Build();
 
