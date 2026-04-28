@@ -29,6 +29,7 @@ namespace KadiovVehicleCare
 
             builder.Services.AddControllersWithViews();
             builder.Services.AddScoped<IServiceRepository,ServiceRepository>();
+            builder.Services.AddScoped<IClientRepository, ClientRepository>();
 
             var app = builder.Build();
 
