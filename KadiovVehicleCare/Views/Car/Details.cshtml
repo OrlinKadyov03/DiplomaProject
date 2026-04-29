@@ -1,0 +1,32 @@
+﻿@model KadiovVehicleCare.ViewModels.CarViewModel
+
+@{
+    ViewData["Title"] = "Детайли за автомобил";
+}
+
+<h1>Детайли за автомобил</h1>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-3">Марка</dt>
+        <dd class="col-sm-9">@Model.Brand</dd>
+
+        <dt class="col-sm-3">Модел</dt>
+        <dd class="col-sm-9">@Model.Model</dd>
+
+        <dt class="col-sm-3">Рег. номер</dt>
+        <dd class="col-sm-9">@Model.PlateNumber</dd>
+
+        <dt class="col-sm-3">Година</dt>
+        <dd class="col-sm-9">@Model.Year</dd>
+
+        <dt class="col-sm-3">Цвят</dt>
+        <dd class="col-sm-9">@Model.Color</dd>
+
+        <dt class="col-sm-3">Клиент</dt>
+        <dd class="col-sm-9">@Model.ClientFullName</dd>
+    </dl>
+</div>
+
+<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редакция</a>
+<a asp-action="Index" class="btn btn-secondary">Назад</a>

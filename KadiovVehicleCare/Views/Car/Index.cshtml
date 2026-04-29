@@ -1,0 +1,43 @@
+﻿@model IEnumerable<KadiovVehicleCare.ViewModels.CarViewModel>
+
+@{
+    ViewData["Title"] = "Автомобили";
+}
+
+<h1>Автомобили</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Добави автомобил</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Марка</th>
+            <th>Модел</th>
+            <th>Рег. номер</th>
+            <th>Година</th>
+            <th>Цвят</th>
+            <th>Клиент</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Brand</td>
+                <td>@item.Model</td>
+                <td>@item.PlateNumber</td>
+                <td>@item.Year</td>
+                <td>@item.Color</td>
+                <td>@item.ClientFullName</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id">Детайли</a> |
+                    <a asp-action="Edit" asp-route-id="@item.Id">Редакция</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Изтриване</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
