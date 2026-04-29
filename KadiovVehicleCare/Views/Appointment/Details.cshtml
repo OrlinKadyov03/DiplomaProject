@@ -1,0 +1,35 @@
+﻿@model KadiovVehicleCare.ViewModels.AppointmentViewModel
+
+@{
+    ViewData["Title"] = "Детайли за записване";
+}
+
+<h1>Детайли за записване</h1>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-3">Клиент</dt>
+        <dd class="col-sm-9">@Model.ClientFullName</dd>
+
+        <dt class="col-sm-3">Автомобил</dt>
+        <dd class="col-sm-9">@Model.CarInfo</dd>
+
+        <dt class="col-sm-3">Услуга</dt>
+        <dd class="col-sm-9">@Model.ServiceName</dd>
+
+        <dt class="col-sm-3">Служител</dt>
+        <dd class="col-sm-9">@Model.EmployeeId</dd>
+
+        <dt class="col-sm-3">Дата и час</dt>
+        <dd class="col-sm-9">@Model.AppointmentDate.ToString("dd.MM.yyyy HH:mm")</dd>
+
+        <dt class="col-sm-3">Статус</dt>
+        <dd class="col-sm-9">@Model.Status</dd>
+
+        <dt class="col-sm-3">Бележки</dt>
+        <dd class="col-sm-9">@Model.Notes</dd>
+    </dl>
+</div>
+
+<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редакция</a>
+<a asp-action="Index" class="btn btn-secondary">Назад</a>
