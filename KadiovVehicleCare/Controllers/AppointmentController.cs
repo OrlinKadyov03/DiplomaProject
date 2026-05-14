@@ -4,10 +4,12 @@ using KadiovVehicleCare.Models;
 using KadiovVehicleCare.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Authorization;
 
 namespace KadiovVehicleCare.Controllers
 {
 
+    [Authorize(Roles = "Admin,User")]
     public class AppointmentController : Controller
     {
         private readonly IAppointmentRepository _appointmentRepository;
@@ -182,6 +184,7 @@ namespace KadiovVehicleCare.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var appointment = await _appointmentRepository.GetByIdAsync(id);
@@ -201,7 +204,7 @@ namespace KadiovVehicleCare.Controllers
 
             return View(viewModel);
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

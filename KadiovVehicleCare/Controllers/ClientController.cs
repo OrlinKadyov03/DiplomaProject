@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace KadiovVehicleCare.Controllers
 {
-
+    [Authorize(Roles = "Admin,User")]
     public class ClientController : Controller
     {
         private readonly IClientRepository _clientRepository;
@@ -127,7 +127,7 @@ namespace KadiovVehicleCare.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var client = await _clientRepository.GetByIdAsync(id);
@@ -146,6 +146,7 @@ namespace KadiovVehicleCare.Controllers
             return View(viewModel);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

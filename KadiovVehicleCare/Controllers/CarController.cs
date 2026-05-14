@@ -1,4 +1,5 @@
-﻿using KadiovVehicleCare.Interfaces;
+﻿using KadiovVehicleCare.Data;
+using KadiovVehicleCare.Interfaces;
 using KadiovVehicleCare.Models;
 using KadiovVehicleCare.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -7,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace KadiovVehicleCare.Controllers
 {
-    
+    [Authorize(Roles = "Admin,User")]
     public class CarController : Controller
     {
         private readonly ICarRepository _carRepository;
@@ -188,6 +189,7 @@ namespace KadiovVehicleCare.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var car = await _carRepository.GetByIdAsync(id);
@@ -207,6 +209,7 @@ namespace KadiovVehicleCare.Controllers
             return View(viewModel);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
