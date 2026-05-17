@@ -184,7 +184,6 @@ namespace KadiovVehicleCare.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var appointment = await _appointmentRepository.GetByIdAsync(id);
@@ -204,7 +203,7 @@ namespace KadiovVehicleCare.Controllers
 
             return View(viewModel);
         }
-        [Authorize(Roles = "Admin")]
+
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

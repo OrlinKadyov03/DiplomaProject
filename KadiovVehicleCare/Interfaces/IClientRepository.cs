@@ -4,6 +4,7 @@ namespace KadiovVehicleCare.Interfaces
 {
     public interface IClientRepository
     {
+        Task<Client?> GetByUserIdAsync(string userId);
         Task<IEnumerable<Client>> GetAllAsync();
         Task<Client?> GetByIdAsync(int id);
         Task<bool> AddAsync(Client client);

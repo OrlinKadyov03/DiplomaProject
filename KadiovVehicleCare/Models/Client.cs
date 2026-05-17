@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace KadiovVehicleCare.Models
 {
@@ -18,6 +19,9 @@ namespace KadiovVehicleCare.Models
         public string? Email { get; set; }
 
         public DateTime CreatedAt { get; set; }
+
+        public string? UserId { get; set; }
+        public IdentityUser? User { get; set; }
         public ICollection<Car> Cars { get; set; } = new List<Car>();
         public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
     }

@@ -1,8 +1,137 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Начало";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container py-5">
+    <div class="p-5 mb-5 rounded-4 bg-dark text-white shadow-lg">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-3">Kadiov Vehicle Care</h1>
+                <p class="lead mb-4">
+                    Уеб базирана система за управление на автокозметични услуги, клиенти, автомобили и записвания.
+                </p>
+
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <div class="d-flex flex-wrap gap-2">
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-controller="Service" asp-action="Index" class="btn btn-warning btn-lg">Услуги</a>
+                        }
+                        <a asp-controller="Client" asp-action="Index" class="btn btn-outline-light btn-lg">Клиенти</a>
+                        <a asp-controller="Car" asp-action="Index" class="btn btn-outline-light btn-lg">Автомобили</a>
+                        <a asp-controller="Appointment" asp-action="Index" class="btn btn-outline-light btn-lg">Записвания</a>
+                    </div>
+                }
+                else
+                {
+                    <div class="d-flex flex-wrap gap-2">
+                        <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-warning btn-lg">Вход</a>
+                        <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-outline-light btn-lg">Регистрация</a>
+                    </div>
+                }
+            </div>
+
+            <div class="col-lg-4 text-center mt-4 mt-lg-0">
+                <div class="bg-white text-dark rounded-4 p-4 shadow">
+                    <h4 class="fw-bold mb-3">Основни модули</h4>
+                    <p class="mb-2">Клиенти</p>
+                    <p class="mb-2">Автомобили</p>
+                    <p class="mb-2">Услуги</p>
+                    <p class="mb-0">Записвания</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold">Управление на услуги</h4>
+                    <p class="text-muted">
+                        Поддържане на списък с автокозметични услуги, цени и времетраене.
+                    </p>
+                    @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                    {
+                        <a asp-controller="Services" asp-action="Index" class="btn btn-dark">Отвори</a>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold">Управление на клиенти</h4>
+                    <p class="text-muted">
+                        Създаване, преглед и редактиране на клиентски профили и контактни данни.
+                    </p>
+                    @if (User.Identity != null && User.Identity.IsAuthenticated)
+                    {
+                        <a asp-controller="Clients" asp-action="Index" class="btn btn-primary">Отвори</a>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold">Управление на автомобили</h4>
+                    <p class="text-muted">
+                        Добавяне и поддържане на автомобили, свързани с определени клиенти.
+                    </p>
+                    @if (User.Identity != null && User.Identity.IsAuthenticated)
+                    {
+                        <a asp-controller="Cars" asp-action="Index" class="btn btn-primary">Отвори</a>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold">Управление на записвания</h4>
+                    <p class="text-muted">
+                        Организация на записвания за услуги, дата, автомобил и клиент.
+                    </p>
+                    @if (User.Identity != null && User.Identity.IsAuthenticated)
+                    {
+                        <a asp-controller="Appointments" asp-action="Index" class="btn btn-primary">Отвори</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="p-4 bg-light rounded-4 shadow-sm h-100">
+                <h3 class="fw-bold mb-3">Какво предлага системата</h3>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item bg-light">Ролево ограничение на достъпа</li>
+                    <li class="list-group-item bg-light">Управление на клиенти и автомобили</li>
+                    <li class="list-group-item bg-light">Поддръжка на услуги</li>
+                    <li class="list-group-item bg-light">Създаване и проследяване на записвания</li>
+                    <li class="list-group-item bg-light">По-добра организация на ежедневната работа</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="p-4 rounded-4 shadow-sm h-100 border">
+                <h3 class="fw-bold mb-3">За приложението</h3>
+                <p class="text-muted">
+                    Системата е разработена с ASP.NET Core MVC и има за цел да подпомогне управлението
+                    на процесите в автокозметичен център чрез централизирано съхранение и обработка на информация.
+                </p>
+                <p class="text-muted mb-0">
+                    Чрез приложението се подобрява проследимостта на клиентите, автомобилите, услугите и записванията,
+                    като се осигурява по-удобна и структурирана работа за потребителите.
+                </p>
+            </div>
+        </div>
+    </div>
 </div>

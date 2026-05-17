@@ -14,6 +14,11 @@ namespace KadiovVehicleCare.Repository
             _context = context;
         }
 
+        public async Task<Client?> GetByUserIdAsync(string userId)
+        {
+            return await _context.Clients.FirstOrDefaultAsync(c => c.UserId == userId);
+        }
+
         public async Task<IEnumerable<Client>> GetAllAsync()
         {
             return await _context.Clients.ToListAsync();

@@ -24,6 +24,17 @@ namespace KadiovVehicleCare.Data
         {
             base.OnModelCreating(builder);
 
+            builder.Entity<Client>()
+              .HasIndex(c => c.UserId)
+              .IsUnique()
+              .HasFilter("[UserId] IS NOT NULL");
+
+            builder.Entity<Client>()
+                .HasOne(c => c.User)
+                .WithOne()
+                .HasForeignKey<Client>(c => c.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
             builder.Entity<Appointment>()
                 .HasOne(a => a.Client)
                 .WithMany(c => c.Appointments)

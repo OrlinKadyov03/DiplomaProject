@@ -6,9 +6,12 @@
 
 <h1>Клиенти</h1>
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Добави клиент</a>
-</p>
+@if (ViewBag.CanCreateClient == true)
+{
+    <p>
+        <a asp-action="Create" class="btn btn-primary">Добави клиент</a>
+    </p>
+}
 
 <table class="table table-striped">
     <thead>
@@ -33,7 +36,10 @@
                 <td>
                     <a asp-action="Details" asp-route-id="@item.Id">Детайли</a> |
                     <a asp-action="Edit" asp-route-id="@item.Id">Редакция</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Изтриване</a>
+                    @if(User.IsInRole("Admin"))
+                    {
+                        <a asp-action="Delete" asp-route-id="@item.Id">Изтриване</a>
+                    }
                 </td>
             </tr>
         }

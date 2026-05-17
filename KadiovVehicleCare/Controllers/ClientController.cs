@@ -3,6 +3,7 @@ using KadiovVehicleCare.Models;
 using KadiovVehicleCare.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace KadiovVehicleCare.Controllers
 {
@@ -19,6 +20,17 @@ namespace KadiovVehicleCare.Controllers
         public async Task<IActionResult> Index()
         {
             var clients = await _clientRepository.GetAllAsync();
+
+            if (User.IsInRole("User"))
+            {
+                var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var existingClient = await _clientRepository.GetByUserIdAsync(currentUserId!);
+                ViewBag.CanCreateClient = existingClient == null;
+            }
+            else
+            {
+                ViewBag.CanCreateClient = true;
+            }
 
             var viewModels = clients.Select(c => new ClientViewModel
             {
@@ -51,8 +63,20 @@ namespace KadiovVehicleCare.Controllers
             return View(viewModel);
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            if (User.IsInRole("User"))
+            {
+                var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var existingClient = await _clientRepository.GetByUserIdAsync(currentUserId!);
+
+                if (existingClient != null)
+                {
+                    TempData["Error"] = "От този профил вече е създаден клиент.";
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+
             return View();
         }
 
@@ -63,13 +87,28 @@ namespace KadiovVehicleCare.Controllers
             if (!ModelState.IsValid)
                 return View(viewModel);
 
+            string? currentUserId = null;
+
+            if (User.IsInRole("User"))
+            {
+                currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                var existingClient = await _clientRepository.GetByUserIdAsync(currentUserId!);
+                if (existingClient != null)
+                {
+                    ModelState.AddModelError("", "От този профил вече е създаден клиент.");
+                    return View(viewModel);
+                }
+            }
+
             var client = new Client
             {
                 FirstName = viewModel.FirstName,
                 LastName = viewModel.LastName,
                 PhoneNumber = viewModel.PhoneNumber,
                 Email = viewModel.Email,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.Now,
+                UserId = currentUserId
             };
 
             var result = await _clientRepository.AddAsync(client);
@@ -146,7 +185,7 @@ namespace KadiovVehicleCare.Controllers
             return View(viewModel);
         }
 
-        [Authorize(Roles = "Admin")]
+
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
