@@ -1,4 +1,6 @@
-﻿@{
+﻿@model IEnumerable<KadiovVehicleCare.Models.Service>
+
+@{
     ViewData["Title"] = "Начало";
 }
 
@@ -8,7 +10,7 @@
             <div class="col-lg-8">
                 <h1 class="display-4 fw-bold mb-3">Kadiov Vehicle Care</h1>
                 <p class="lead mb-4">
-                    Уеб базирана система за управление на автокозметични услуги, клиенти, автомобили и записвания.
+                    Уеб базирана система за управление на автокозметични услуги.
                 </p>
 
                 @if (User.Identity != null && User.Identity.IsAuthenticated)
@@ -17,8 +19,14 @@
                         @if (User.IsInRole("Admin"))
                         {
                             <a asp-controller="Service" asp-action="Index" class="btn btn-warning btn-lg">Услуги</a>
+                            <a asp-controller="Client" asp-action="Index" class="btn btn-outline-light btn-lg">Клиенти</a>
                         }
-                        <a asp-controller="Client" asp-action="Index" class="btn btn-outline-light btn-lg">Клиенти</a>
+
+                        @if (User.IsInRole("User"))
+                        {
+                            <a asp-controller="Client" asp-action="Index" class="btn btn-outline-light btn-lg">Моят профил</a>
+                        }
+
                         <a asp-controller="Car" asp-action="Index" class="btn btn-outline-light btn-lg">Автомобили</a>
                         <a asp-controller="Appointment" asp-action="Index" class="btn btn-outline-light btn-lg">Записвания</a>
                     </div>
@@ -44,6 +52,38 @@
         </div>
     </div>
 
+    @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("User"))
+    {
+        <div class="mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold mb-1">Предлагани услуги</h2>
+                    <p class="text-muted mb-0">Списък с услугите, които можете да заявите в системата.</p>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                @foreach (var service in Model)
+                {
+                    <div class="col-md-6 col-xl-4">
+                        <div class="card border-0 shadow-sm rounded-4 h-100">
+                            <div class="card-body p-4">
+                                <h4 class="fw-bold">@service.Name</h4>
+                                <p class="text-muted">@service.Description</p>
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <span class="fw-semibold">@service.Price лв.</span>
+                                    <span class="badge bg-light text-dark rounded-pill px-3 py-2">
+                                        @service.DurationInMinutes мин.
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
     <div class="row g-4 mb-5">
         <div class="col-md-6 col-xl-3">
             <div class="card border-0 shadow-sm rounded-4 h-100">
@@ -52,10 +92,6 @@
                     <p class="text-muted">
                         Поддържане на списък с автокозметични услуги, цени и времетраене.
                     </p>
-                    @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin"))
-                    {
-                        <a asp-controller="Services" asp-action="Index" class="btn btn-dark">Отвори</a>
-                    }
                 </div>
             </div>
         </div>
@@ -67,10 +103,6 @@
                     <p class="text-muted">
                         Създаване, преглед и редактиране на клиентски профили и контактни данни.
                     </p>
-                    @if (User.Identity != null && User.Identity.IsAuthenticated)
-                    {
-                        <a asp-controller="Clients" asp-action="Index" class="btn btn-primary">Отвори</a>
-                    }
                 </div>
             </div>
         </div>
@@ -82,10 +114,6 @@
                     <p class="text-muted">
                         Добавяне и поддържане на автомобили, свързани с определени клиенти.
                     </p>
-                    @if (User.Identity != null && User.Identity.IsAuthenticated)
-                    {
-                        <a asp-controller="Cars" asp-action="Index" class="btn btn-primary">Отвори</a>
-                    }
                 </div>
             </div>
         </div>
@@ -97,10 +125,6 @@
                     <p class="text-muted">
                         Организация на записвания за услуги, дата, автомобил и клиент.
                     </p>
-                    @if (User.Identity != null && User.Identity.IsAuthenticated)
-                    {
-                        <a asp-controller="Appointments" asp-action="Index" class="btn btn-primary">Отвори</a>
-                    }
                 </div>
             </div>
         </div>

@@ -1,3 +1,4 @@
+using KadiovVehicleCare.Interfaces;
 using KadiovVehicleCare.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -7,15 +8,18 @@ namespace KadiovVehicleCare.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IServiceRepository _serviceRepository;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger,IServiceRepository serviceRepository)
         {
             _logger = logger;
+            _serviceRepository = serviceRepository;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var services = await _serviceRepository.GetAllAsync();
+            return View(services);
         }
 
         public IActionResult Privacy()

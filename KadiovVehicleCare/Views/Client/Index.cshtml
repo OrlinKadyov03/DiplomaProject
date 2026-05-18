@@ -4,13 +4,27 @@
     ViewData["Title"] = "Клиенти";
 }
 
-<h1>Клиенти</h1>
+@if (User.IsInRole("Admin"))
+{
+    <h1 class="fw-bold mb-1">Клиенти</h1>
+    <p class="text-muted mb-0">Преглед и управление на клиентски профили.</p>
+}
+else if (User.IsInRole("User"))
+{
+    <h1 class="fw-bold mb-1">Моят профил</h1>
+    <p class="text-muted mb-0">Преглед и редакция на личния клиентски профил.</p>
+}
 
 @if (ViewBag.CanCreateClient == true)
 {
-    <p>
-        <a asp-action="Create" class="btn btn-primary">Добави клиент</a>
-    </p>
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-action="Create" class="btn btn-dark rounded-3 px-4">Добави клиент</a>
+    }
+    else if (User.IsInRole("User"))
+    {
+        <a asp-action="Create" class="btn btn-dark rounded-3 px-4">Създай профил</a>
+    }
 }
 
 <table class="table table-striped">
@@ -33,12 +47,17 @@
                 <td>@item.PhoneNumber</td>
                 <td>@item.Email</td>
                 <td>@item.CreatedAt.ToString("dd.MM.yyyy")</td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.Id">Детайли</a> |
-                    <a asp-action="Edit" asp-route-id="@item.Id">Редакция</a> |
-                    @if(User.IsInRole("Admin"))
+                <td class="text-end">
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary rounded-3">Детайли</a>
+
+                    @if (User.IsInRole("Admin") || User.IsInRole("User"))
                     {
-                        <a asp-action="Delete" asp-route-id="@item.Id">Изтриване</a>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary rounded-3">Редакция</a>
+                    }
+
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger rounded-3">Изтриване</a>
                     }
                 </td>
             </tr>

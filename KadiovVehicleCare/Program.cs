@@ -32,7 +32,9 @@ namespace KadiovVehicleCare
 
             })
             .AddRoles<IdentityRole>()
+            .AddErrorDescriber<CustomIdentityDescriber>()
             .AddEntityFrameworkStores<ApplicationDbContext>();
+
 
             builder.Services.AddControllersWithViews();
             builder.Services.AddScoped<IServiceRepository,ServiceRepository>();

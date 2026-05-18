@@ -17,9 +17,26 @@ namespace KadiovVehicleCare.Controllers
             _clientRepository = clientRepository;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
             var clients = await _clientRepository.GetAllAsync();
+
+            if (User.IsInRole("User"))
+            {
+                var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                clients = clients.Where(c => c.UserId == currentUserId);
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchString))
+            {
+                searchString = searchString.ToLower();
+
+                clients = clients.Where(c =>
+                    c.FirstName.ToLower().Contains(searchString) ||
+                    c.LastName.ToLower().Contains(searchString) ||
+                    c.PhoneNumber.ToString().Contains(searchString) ||
+                    (c.Email != null && c.Email.ToLower().Contains(searchString)));
+            }
 
             if (User.IsInRole("User"))
             {
@@ -31,6 +48,8 @@ namespace KadiovVehicleCare.Controllers
             {
                 ViewBag.CanCreateClient = true;
             }
+
+            ViewBag.SearchString = searchString;
 
             var viewModels = clients.Select(c => new ClientViewModel
             {
@@ -49,6 +68,15 @@ namespace KadiovVehicleCare.Controllers
         {
             var client = await _clientRepository.GetByIdAsync(id);
             if (client == null) return NotFound();
+
+            if (User.IsInRole("User"))
+            {
+                var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (client.UserId != currentUserId)
+                {
+                    return Forbid();
+                }
+            }
 
             var viewModel = new ClientViewModel
             {
@@ -120,11 +148,19 @@ namespace KadiovVehicleCare.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
         public async Task<IActionResult> Edit(int id)
         {
             var client = await _clientRepository.GetByIdAsync(id);
             if (client == null) return NotFound();
+
+            if (User.IsInRole("User"))
+            {
+                var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (client.UserId != currentUserId)
+                {
+                    return Forbid();
+                }
+            }
 
             var viewModel = new EditClientViewModel
             {
@@ -150,6 +186,15 @@ namespace KadiovVehicleCare.Controllers
 
             var client = await _clientRepository.GetByIdAsync(id);
             if (client == null) return NotFound();
+
+            if (User.IsInRole("User"))
+            {
+                var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (client.UserId != currentUserId)
+                {
+                    return Forbid();
+                }
+            }
 
             client.FirstName = viewModel.FirstName;
             client.LastName = viewModel.LastName;
@@ -188,6 +233,7 @@ namespace KadiovVehicleCare.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var client = await _clientRepository.GetByIdAsync(id);
