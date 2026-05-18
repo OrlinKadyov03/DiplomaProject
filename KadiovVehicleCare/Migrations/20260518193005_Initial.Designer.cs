@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KadiovVehicleCare.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260518130043_Initial3")]
-    partial class Initial3
+    [Migration("20260518193005_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

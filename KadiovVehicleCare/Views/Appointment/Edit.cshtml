@@ -10,13 +10,20 @@
     <input type="hidden" asp-for="Id" />
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-    <div class="mb-3">
-        <label asp-for="ClientId" class="form-label"></label>
-        <select asp-for="ClientId" asp-items="Model.Clients" class="form-select">
-            <option value="">-- Изберете клиент --</option>
-        </select>
-        <span asp-validation-for="ClientId" class="text-danger"></span>
-    </div>
+    @if (User.IsInRole("Admin"))
+    {
+        <div class="mb-3">
+            <label asp-for="ClientId" class="form-label"></label>
+            <select asp-for="ClientId" asp-items="Model.Clients" class="form-select">
+                <option value="">-- Изберете клиент --</option>
+            </select>
+            <span asp-validation-for="ClientId" class="text-danger"></span>
+        </div>
+    }
+    else if (User.IsInRole("User"))
+    {
+        <input type="hidden" asp-for="ClientId" />
+    }
 
     <div class="mb-3">
         <label asp-for="CarId" class="form-label"></label>
@@ -34,11 +41,14 @@
         <span asp-validation-for="ServiceId" class="text-danger"></span>
     </div>
 
-    <div class="mb-3">
-        <label asp-for="EmployeeId" class="form-label"></label>
-        <input asp-for="EmployeeId" class="form-control" />
-        <span asp-validation-for="EmployeeId" class="text-danger"></span>
-    </div>
+    @if (User.IsInRole("Admin"))
+    {
+        <div class="mb-3">
+            <label asp-for="EmployeeId" class="form-label"></label>
+            <input asp-for="EmployeeId" class="form-control" />
+            <span asp-validation-for="EmployeeId" class="text-danger"></span>
+        </div>
+    }
 
     <div class="mb-3">
         <label asp-for="AppointmentDate" class="form-label"></label>
@@ -46,11 +56,18 @@
         <span asp-validation-for="AppointmentDate" class="text-danger"></span>
     </div>
 
-    <div class="mb-3">
-        <label asp-for="Status" class="form-label"></label>
-        <select asp-for="Status" asp-items="Model.Statuses" class="form-select"></select>
-        <span asp-validation-for="Status" class="text-danger"></span>
-    </div>
+    @if (User.IsInRole("Admin"))
+    {
+        <div class="mb-3">
+            <label asp-for="Status" class="form-label"></label>
+            <select asp-for="Status" asp-items="Model.Statuses" class="form-select"></select>
+            <span asp-validation-for="Status" class="text-danger"></span>
+        </div>
+    }
+    else if (User.IsInRole("User"))
+    {
+        <input type="hidden" asp-for="Status" />
+    }
 
     <div class="mb-3">
         <label asp-for="Notes" class="form-label"></label>

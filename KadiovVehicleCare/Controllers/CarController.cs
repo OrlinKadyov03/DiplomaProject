@@ -5,6 +5,7 @@ using KadiovVehicleCare.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Security.Claims;
 
 namespace KadiovVehicleCare.Controllers
 {
@@ -20,9 +21,28 @@ namespace KadiovVehicleCare.Controllers
             _clientRepository = clientRepository;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
             var cars = await _carRepository.GetAllAsync();
+
+            if (User.IsInRole("User"))
+            {
+                var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                cars = cars.Where(c => c.Client != null && c.Client.UserId == currentUserId);
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchString))
+            {
+                var search = searchString.ToLower();
+
+                cars = cars.Where(c =>
+                    c.Brand.ToLower().Contains(search) ||
+                    c.Model.ToLower().Contains(search) ||
+                    c.PlateNumber.ToLower().Contains(search) ||
+                    (c.Color != null && c.Color.ToLower().Contains(search)));
+            }
+
+            ViewBag.SearchString = searchString;
 
             var viewModels = cars.Select(c => new CarViewModel
             {
@@ -59,9 +79,29 @@ namespace KadiovVehicleCare.Controllers
 
         public async Task<IActionResult> Create()
         {
+            if (User.IsInRole("User"))
+            {
+                var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var client = await _clientRepository.GetByUserIdAsync(currentUserId!);
+
+                if (client == null)
+                {
+                    TempData["Error"] = "Първо трябва да създадете клиентски профил.";
+                    return RedirectToAction("Index", "Clients");
+                }
+
+                var viewModel = new CreateCarViewModel
+                {
+                    ClientId = client.Id,
+                    Clients = new List<SelectListItem>()
+                };
+
+                return View(viewModel);
+            }
+
             var clients = await _clientRepository.GetAllAsync();
 
-            var viewModel = new CreateCarViewModel
+            var adminViewModel = new CreateCarViewModel
             {
                 Clients = clients.Select(c => new SelectListItem
                 {
@@ -70,21 +110,41 @@ namespace KadiovVehicleCare.Controllers
                 })
             };
 
-            return View(viewModel);
+            return View(adminViewModel);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateCarViewModel viewModel)
         {
+            if (User.IsInRole("User"))
+            {
+                var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var client = await _clientRepository.GetByUserIdAsync(currentUserId!);
+
+                if (client == null)
+                {
+                    return Forbid();
+                }
+
+                viewModel.ClientId = client.Id;
+            }
+
             if (!ModelState.IsValid)
             {
-                var clients = await _clientRepository.GetAllAsync();
-                viewModel.Clients = clients.Select(c => new SelectListItem
+                if (User.IsInRole("Admin"))
                 {
-                    Value = c.Id.ToString(),
-                    Text = $"{c.FirstName} {c.LastName}"
-                });
+                    var clients = await _clientRepository.GetAllAsync();
+                    viewModel.Clients = clients.Select(c => new SelectListItem
+                    {
+                        Value = c.Id.ToString(),
+                        Text = $"{c.FirstName} {c.LastName}"
+                    });
+                }
+                else
+                {
+                    viewModel.Clients = new List<SelectListItem>();
+                }
 
                 return View(viewModel);
             }
@@ -104,12 +164,15 @@ namespace KadiovVehicleCare.Controllers
             {
                 ModelState.AddModelError("", "Неуспешно добавяне на автомобил.");
 
-                var clients = await _clientRepository.GetAllAsync();
-                viewModel.Clients = clients.Select(c => new SelectListItem
+                if (User.IsInRole("Admin"))
                 {
-                    Value = c.Id.ToString(),
-                    Text = $"{c.FirstName} {c.LastName}"
-                });
+                    var clients = await _clientRepository.GetAllAsync();
+                    viewModel.Clients = clients.Select(c => new SelectListItem
+                    {
+                        Value = c.Id.ToString(),
+                        Text = $"{c.FirstName} {c.LastName}"
+                    });
+                }
 
                 return View(viewModel);
             }
@@ -122,9 +185,33 @@ namespace KadiovVehicleCare.Controllers
             var car = await _carRepository.GetByIdAsync(id);
             if (car == null) return NotFound();
 
+            if (User.IsInRole("User"))
+            {
+                var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (car.Client == null || car.Client.UserId != currentUserId)
+                {
+                    return Forbid();
+                }
+
+                var userViewModel = new EditCarViewModel
+                {
+                    Id = car.Id,
+                    Brand = car.Brand,
+                    Model = car.Model,
+                    PlateNumber = car.PlateNumber,
+                    Year = car.Year,
+                    Color = car.Color,
+                    ClientId = car.ClientId,
+                    Clients = new List<SelectListItem>()
+                };
+
+                return View(userViewModel);
+            }
+
             var clients = await _clientRepository.GetAllAsync();
 
-            var viewModel = new EditCarViewModel
+            var adminViewModel = new EditCarViewModel
             {
                 Id = car.Id,
                 Brand = car.Brand,
@@ -140,7 +227,7 @@ namespace KadiovVehicleCare.Controllers
                 })
             };
 
-            return View(viewModel);
+            return View(adminViewModel);
         }
 
         [HttpPost]
@@ -149,40 +236,55 @@ namespace KadiovVehicleCare.Controllers
         {
             if (id != viewModel.Id) return NotFound();
 
+            var car = await _carRepository.GetByIdAsync(id);
+            if (car == null) return NotFound();
+
+            if (User.IsInRole("User"))
+            {
+                var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (car.Client == null || car.Client.UserId != currentUserId)
+                {
+                    return Forbid();
+                }
+
+                viewModel.ClientId = car.ClientId;
+            }
+
             if (!ModelState.IsValid)
             {
-                var clients = await _clientRepository.GetAllAsync();
-                viewModel.Clients = clients.Select(c => new SelectListItem
+                if (User.IsInRole("Admin"))
                 {
-                    Value = c.Id.ToString(),
-                    Text = $"{c.FirstName} {c.LastName}"
-                });
+                    var clients = await _clientRepository.GetAllAsync();
+                    viewModel.Clients = clients.Select(c => new SelectListItem
+                    {
+                        Value = c.Id.ToString(),
+                        Text = $"{c.FirstName} {c.LastName}"
+                    });
+                }
+                else
+                {
+                    viewModel.Clients = new List<SelectListItem>();
+                }
 
                 return View(viewModel);
             }
-
-            var car = await _carRepository.GetByIdAsync(id);
-            if (car == null) return NotFound();
 
             car.Brand = viewModel.Brand;
             car.Model = viewModel.Model;
             car.PlateNumber = viewModel.PlateNumber;
             car.Year = viewModel.Year;
             car.Color = viewModel.Color;
-            car.ClientId = viewModel.ClientId;
+
+            if (User.IsInRole("Admin"))
+            {
+                car.ClientId = viewModel.ClientId;
+            }
 
             var result = await _carRepository.UpdateAsync(car);
             if (!result)
             {
                 ModelState.AddModelError("", "Неуспешно редактиране на автомобил.");
-
-                var clients = await _clientRepository.GetAllAsync();
-                viewModel.Clients = clients.Select(c => new SelectListItem
-                {
-                    Value = c.Id.ToString(),
-                    Text = $"{c.FirstName} {c.LastName}"
-                });
-
                 return View(viewModel);
             }
 

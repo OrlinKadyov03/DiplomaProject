@@ -25,28 +25,22 @@ namespace KadiovVehicleCare.Controllers
             {
                 var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 clients = clients.Where(c => c.UserId == currentUserId);
-            }
-
-            if (!string.IsNullOrWhiteSpace(searchString))
-            {
-                searchString = searchString.ToLower();
-
-                clients = clients.Where(c =>
-                    c.FirstName.ToLower().Contains(searchString) ||
-                    c.LastName.ToLower().Contains(searchString) ||
-                    c.PhoneNumber.ToString().Contains(searchString) ||
-                    (c.Email != null && c.Email.ToLower().Contains(searchString)));
-            }
-
-            if (User.IsInRole("User"))
-            {
-                var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                var existingClient = await _clientRepository.GetByUserIdAsync(currentUserId!);
-                ViewBag.CanCreateClient = existingClient == null;
+                ViewBag.CanCreateClient = !clients.Any();
             }
             else
             {
                 ViewBag.CanCreateClient = true;
+
+                if (!string.IsNullOrWhiteSpace(searchString))
+                {
+                    var search = searchString.ToLower();
+
+                    clients = clients.Where(c =>
+                        c.FirstName.ToLower().Contains(search) ||
+                        c.LastName.ToLower().Contains(search) ||
+                        c.PhoneNumber.ToString().Contains(search) ||
+                        (c.Email != null && c.Email.ToLower().Contains(search)));
+                }
             }
 
             ViewBag.SearchString = searchString;

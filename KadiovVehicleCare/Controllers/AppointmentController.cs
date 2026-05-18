@@ -5,6 +5,7 @@ using KadiovVehicleCare.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace KadiovVehicleCare.Controllers
 {
@@ -70,15 +71,66 @@ namespace KadiovVehicleCare.Controllers
 
         public async Task<IActionResult> Create()
         {
-            var viewModel = new CreateAppointmentViewModel
+            var services = await _serviceRepository.GetAllAsync();
+
+            if (User.IsInRole("User"))
+            {
+                var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var client = await _clientRepository.GetByUserIdAsync(currentUserId!);
+
+                if (client == null)
+                {
+                    TempData["Error"] = "Първо трябва да създадете клиентски профил.";
+                    return RedirectToAction("Index", "Clients");
+                }
+
+                var cars = await _carRepository.GetAllAsync();
+                var userCars = cars.Where(c => c.ClientId == client.Id);
+
+                var viewModel = new CreateAppointmentViewModel
+                {
+                    ClientId = client.Id,
+                    AppointmentDate = DateTime.Now,
+                    Cars = userCars.Select(c => new SelectListItem
+                    {
+                        Value = c.Id.ToString(),
+                        Text = $"{c.Brand} {c.Model} ({c.PlateNumber})"
+                    }),
+                    Services = services.Select(s => new SelectListItem
+                    {
+                        Value = s.Id.ToString(),
+                        Text = s.Name
+                    }),
+                    Clients = new List<SelectListItem>()
+                };
+
+                return View(viewModel);
+            }
+
+            var clients = await _clientRepository.GetAllAsync();
+            var allCars = await _carRepository.GetAllAsync();
+
+            var adminViewModel = new CreateAppointmentViewModel
             {
                 AppointmentDate = DateTime.Now,
-                Clients = await GetClientsSelectList(),
-                Cars = await GetCarsSelectList(),
-                Services = await GetServicesSelectList()
+                Clients = clients.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = $"{c.FirstName} {c.LastName}"
+                }),
+                Cars = allCars.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = $"{c.Brand} {c.Model} ({c.PlateNumber})"
+                }),
+                Services = services.Select(s => new SelectListItem
+                {
+                    Value = s.Id.ToString(),
+                    Text = s.Name
+                })
             };
 
-            return View(viewModel);
+            return View(adminViewModel);
         }
 
         [HttpPost]
@@ -115,13 +167,56 @@ namespace KadiovVehicleCare.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
         public async Task<IActionResult> Edit(int id)
         {
             var appointment = await _appointmentRepository.GetByIdAsync(id);
             if (appointment == null) return NotFound();
 
-            var viewModel = new EditAppointmentViewModel
+            var services = await _serviceRepository.GetAllAsync();
+
+            if (User.IsInRole("User"))
+            {
+                var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (appointment.Client == null || appointment.Client.UserId != currentUserId)
+                {
+                    return Forbid();
+                }
+
+                var cars = await _carRepository.GetAllAsync();
+                var userCars = cars.Where(c => c.ClientId == appointment.ClientId);
+
+                var userViewModel = new EditAppointmentViewModel
+                {
+                    Id = appointment.Id,
+                    ClientId = appointment.ClientId,
+                    CarId = appointment.CarId,
+                    ServiceId = appointment.ServiceId,
+                    EmployeeId = appointment.EmployeeId,
+                    AppointmentDate = appointment.AppointmentDate,
+                    Status = appointment.Status.ToString(),
+                    Notes = appointment.Notes,
+                    Clients = new List<SelectListItem>(),
+                    Cars = userCars.Select(c => new SelectListItem
+                    {
+                        Value = c.Id.ToString(),
+                        Text = $"{c.Brand} {c.Model} ({c.PlateNumber})"
+                    }),
+                    Services = services.Select(s => new SelectListItem
+                    {
+                        Value = s.Id.ToString(),
+                        Text = s.Name
+                    }),
+                    Statuses = GetStatusesSelectList()
+                };
+
+                return View(userViewModel);
+            }
+
+            var clients = await _clientRepository.GetAllAsync();
+            var allCars = await _carRepository.GetAllAsync();
+
+            var adminViewModel = new EditAppointmentViewModel
             {
                 Id = appointment.Id,
                 ClientId = appointment.ClientId,
@@ -131,13 +226,25 @@ namespace KadiovVehicleCare.Controllers
                 AppointmentDate = appointment.AppointmentDate,
                 Status = appointment.Status.ToString(),
                 Notes = appointment.Notes,
-                Clients = await GetClientsSelectList(),
-                Cars = await GetCarsSelectList(),
-                Services = await GetServicesSelectList(),
+                Clients = clients.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = $"{c.FirstName} {c.LastName}"
+                }),
+                Cars = allCars.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = $"{c.Brand} {c.Model} ({c.PlateNumber})"
+                }),
+                Services = services.Select(s => new SelectListItem
+                {
+                    Value = s.Id.ToString(),
+                    Text = s.Name
+                }),
                 Statuses = GetStatusesSelectList()
             };
 
-            return View(viewModel);
+            return View(adminViewModel);
         }
 
         [HttpPost]

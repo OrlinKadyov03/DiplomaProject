@@ -39,13 +39,20 @@
         <span asp-validation-for="Color" class="text-danger"></span>
     </div>
 
-    <div class="mb-3">
-        <label asp-for="ClientId" class="form-label"></label>
-        <select asp-for="ClientId" asp-items="Model.Clients" class="form-select">
-            <option value="">-- Изберете клиент --</option>
-        </select>
-        <span asp-validation-for="ClientId" class="text-danger"></span>
-    </div>
+    @if (User.IsInRole("Admin"))
+    {
+        <div class="mb-3">
+            <label asp-for="ClientId" class="form-label"></label>
+            <select asp-for="ClientId" asp-items="Model.Clients" class="form-select">
+                <option value="">-- Изберете клиент --</option>
+            </select>
+            <span asp-validation-for="ClientId" class="text-danger"></span>
+        </div>
+    }
+    else if (User.IsInRole("User"))
+    {
+        <input type="hidden" asp-for="ClientId" />
+    }
 
     <button type="submit" class="btn btn-success">Запази</button>
     <a asp-action="Index" class="btn btn-secondary">Назад</a>
