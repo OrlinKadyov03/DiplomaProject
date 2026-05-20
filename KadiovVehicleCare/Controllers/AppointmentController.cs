@@ -30,9 +30,32 @@ namespace KadiovVehicleCare.Controllers
             _serviceRepository = serviceRepository;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
             var appointments = await _appointmentRepository.GetAllAsync();
+
+            if (User.IsInRole("User"))
+            {
+                var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                appointments = appointments.Where(a => a.Client != null && a.Client.UserId == currentUserId);
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchString))
+            {
+                var search = searchString.ToLower();
+
+                appointments = appointments.Where(a =>
+                    (a.Client != null && ($"{a.Client.FirstName} {a.Client.LastName}").ToLower().Contains(search)) ||
+                    (a.Car != null && ($"{a.Car.Brand} {a.Car.Model} {a.Car.PlateNumber}").ToLower().Contains(search)) ||
+                    (a.Service != null && a.Service.Name.ToLower().Contains(search)) ||
+                    a.Status.ToString().ToLower().Contains(search) ||
+                    (a.Notes != null && a.Notes.ToLower().Contains(search))
+                );
+            }
+
+            appointments = appointments.OrderByDescending(a => a.AppointmentDate);
+
+            ViewBag.SearchString = searchString;
 
             var viewModels = appointments.Select(a => new AppointmentViewModel
             {
@@ -40,7 +63,6 @@ namespace KadiovVehicleCare.Controllers
                 ClientFullName = a.Client != null ? $"{a.Client.FirstName} {a.Client.LastName}" : "",
                 CarInfo = a.Car != null ? $"{a.Car.Brand} {a.Car.Model} ({a.Car.PlateNumber})" : "",
                 ServiceName = a.Service != null ? a.Service.Name : "",
-                EmployeeId = a.EmployeeId,
                 AppointmentDate = a.AppointmentDate,
                 Status = a.Status.ToString(),
                 Notes = a.Notes

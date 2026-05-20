@@ -41,14 +41,6 @@
         <span asp-validation-for="ServiceId" class="text-danger"></span>
     </div>
 
-    @if (User.IsInRole("Admin"))
-    {
-        <div class="mb-3">
-            <label asp-for="EmployeeId" class="form-label"></label>
-            <input asp-for="EmployeeId" class="form-control" />
-            <span asp-validation-for="EmployeeId" class="text-danger"></span>
-        </div>
-    }
 
     <div class="mb-3">
         <label asp-for="AppointmentDate" class="form-label"></label>
