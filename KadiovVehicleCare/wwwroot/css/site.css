@@ -20,3 +20,15 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.navbar .nav-link {
+    font-weight: 500;
+}
+
+.navbar .nav-link:hover {
+        color: #ffc107 !important;
+ }
+
+.navbar-brand {
+    letter-spacing: 0.3px;
+}

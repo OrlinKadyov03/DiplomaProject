@@ -5,22 +5,22 @@ namespace KadiovVehicleCare.ViewModels
 {
     public class CreateAppointmentViewModel
     {
-        [Required]
+        [Required(ErrorMessage = "Полето Клиент е задължително!")]
         [Display(Name = "Клиент")]
         public int ClientId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Полето Автомобил е задължително!")]
         [Display(Name = "Автомобил")]
         public int CarId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Полето Услуга е задължително!")]
         [Display(Name = "Услуга")]
         public int ServiceId { get; set; }
 
         [Display(Name = "Служител")]
         public string? EmployeeId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Полето Дата и час е задължително!")]
         [Display(Name = "Дата и час")]
         public DateTime AppointmentDate { get; set; }
 

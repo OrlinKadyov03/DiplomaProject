@@ -8,6 +8,7 @@ namespace KadiovVehicleCare.Models
         [Required]
         [StringLength(50)]
         public int Id { get; set; }
+
         [Required]
         [StringLength(50)]
         public string Brand { get; set; }

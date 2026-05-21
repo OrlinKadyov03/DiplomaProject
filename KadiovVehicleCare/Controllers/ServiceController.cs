@@ -48,12 +48,12 @@ namespace KadiovVehicleCare.Controllers
 
             return View(viewModel);
         }
-
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateServiceViewModel viewModel)
@@ -95,7 +95,7 @@ namespace KadiovVehicleCare.Controllers
 
             return View(viewModel);
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, EditServiceViewModel viewModel)

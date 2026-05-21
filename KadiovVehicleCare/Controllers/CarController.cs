@@ -87,7 +87,7 @@ namespace KadiovVehicleCare.Controllers
                 if (client == null)
                 {
                     TempData["Error"] = "Първо трябва да създадете клиентски профил.";
-                    return RedirectToAction("Index", "Clients");
+                    return RedirectToAction("Index", "Client");
                 }
 
                 var viewModel = new CreateCarViewModel

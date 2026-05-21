@@ -7,21 +7,21 @@ namespace KadiovVehicleCare.ViewModels
     {
         public int Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Полето Марка е задължително!")]
         [StringLength(50)]
         [Display(Name = "Марка")]
         public string Brand { get; set; } 
 
-        [Required]
+        [Required(ErrorMessage = "Полето Модел е задължително!")]
         [StringLength(50)]
         [Display(Name = "Модел")]
         public string Model { get; set; } 
 
-        [Required]
+        [Required(ErrorMessage = "Полето Регистрационен номер е задължително!")]
         [StringLength(15)]
         [Display(Name = "Регистрационен номер")]
-        public string PlateNumber { get; set; } 
-
+        public string PlateNumber { get; set; }
+        [Required(ErrorMessage = "Полето Година е задължително!")]
         [Display(Name = "Година")]
         public int Year { get; set; }
 
